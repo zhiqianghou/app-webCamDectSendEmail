@@ -2,6 +2,7 @@
 # pip install opencv-python
 import cv2
 import time
+from emailing import send_email
 
 
 # Use main camera of the laptop
@@ -9,6 +10,9 @@ video = cv2.VideoCapture(0)
 time.sleep(0.1)
 
 ref_frame = None
+
+status = 0
+status_list = []
 
 while True:
 
@@ -33,7 +37,15 @@ while True:
 			if cv2.contourArea(contour) <5000:
 				continue
 			x, y, w, h = cv2.boundingRect(contour)
-			cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3) # weight=3.
+			rectangle = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3) # weight=3.
+			if rectangle.any():
+				status = 1
+
+		status_list.append(status)
+		status_list = status_list[-2:]
+
+		if status_list[0] == 1 and status_list[1] == 0:
+			send_email()
 
 		cv2. imshow("Video", frame)
 
