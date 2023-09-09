@@ -1,10 +1,11 @@
 # opencv is built on top of numpy, use BGR, not RGB
 # pip install opencv-python
 import glob
-
+import os
 import cv2
 import time
 from emailing import send_email
+
 
 
 # Use main camera of the laptop
@@ -16,6 +17,13 @@ ref_frame = None
 status = 0
 status_list = []
 count = 1
+
+
+def clean_folder():
+	images = glob.glob("images/*.png")
+	for image in images:
+		os.remove(image)
+
 
 while True:
 
@@ -46,7 +54,7 @@ while True:
 				cv2.imwrite(f"images/{count}.png", frame)
 				count += 1
 				all_images = glob.glob("images/*.png")
-				index = len(all_images) // 2
+				index = int(len(all_images) / 2)
 				image_with_object = all_images[index]
 
 		status_list.append(status)
@@ -54,6 +62,9 @@ while True:
 
 		if status_list[0] == 1 and status_list[1] == 0:
 			send_email(image_with_object)
+			clean_folder()
+
+		print(status_list)
 
 		cv2. imshow("Video", frame)
 
